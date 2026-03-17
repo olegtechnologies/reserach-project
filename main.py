@@ -235,12 +235,17 @@ class CoreBankingDataGenerator:
         return np.clip(health, 0, 100)
     
     def _generate_correlated_int(self, bank_tier, min_val, max_val, tier_influence=0.5):
-        """Generate integer values correlated with bank tier"""
+        """Generate integer values correlated with bank tier
+        Note: Microfinance includes digital fintechs (high resources) and traditional MFBs (low resources)"""
         tier_scores = {'tier1': 1.0, 'tier2': 0.7, 'tier3': 0.4, 'microfinance': 0.2}
         
         values = np.zeros(len(bank_tier))
         for i, tier in enumerate(bank_tier):
-            tier_score = tier_scores[tier]
+            if tier == 'microfinance':
+                # 50% digital fintechs (score 0.7), 50% traditional MFBs (score 0.2)
+                tier_score = np.random.choice([0.7, 0.2], p=[0.50, 0.50])
+            else:
+                tier_score = tier_scores[tier]
             # Adjust range based on tier
             if tier_influence > 0:
                 # Positive correlation: higher tier = higher value
@@ -257,12 +262,17 @@ class CoreBankingDataGenerator:
         return values.astype(int)
     
     def _generate_correlated_float(self, bank_tier, min_val, max_val, tier_influence=0.5):
-        """Generate float values correlated with bank tier"""
+        """Generate float values correlated with bank tier
+        Note: Microfinance includes digital fintechs (high performance) and traditional MFBs (low performance)"""
         tier_scores = {'tier1': 1.0, 'tier2': 0.7, 'tier3': 0.4, 'microfinance': 0.2}
         
         values = np.zeros(len(bank_tier))
         for i, tier in enumerate(bank_tier):
-            tier_score = tier_scores[tier]
+            if tier == 'microfinance':
+                # 50% digital fintechs (score 0.7), 50% traditional MFBs (score 0.2)
+                tier_score = np.random.choice([0.7, 0.2], p=[0.50, 0.50])
+            else:
+                tier_score = tier_scores[tier]
             # Adjust range based on tier
             if tier_influence > 0:
                 adjusted_min = min_val + (max_val - min_val) * tier_score * tier_influence * 0.3
@@ -294,12 +304,17 @@ class CoreBankingDataGenerator:
         return values.astype(int)
     
     def _generate_binary_correlated(self, bank_tier, base_prob=0.5, tier_influence=0.2):
-        """Generate binary values (0/1) correlated with bank tier"""
+        """Generate binary values (0/1) correlated with bank tier
+        Note: Microfinance includes digital fintechs (high tech) and traditional MFBs (low tech)"""
         tier_scores = {'tier1': 1.0, 'tier2': 0.7, 'tier3': 0.4, 'microfinance': 0.2}
         
         values = np.zeros(len(bank_tier))
         for i, tier in enumerate(bank_tier):
-            tier_score = tier_scores[tier]
+            if tier == 'microfinance':
+                # 50% digital fintechs (score 0.7), 50% traditional MFBs (score 0.2)
+                tier_score = np.random.choice([0.7, 0.2], p=[0.50, 0.50])
+            else:
+                tier_score = tier_scores[tier]
             # Adjust probability based on tier
             adjusted_prob = min(0.98, base_prob + (tier_score - 0.5) * tier_influence)
             values[i] = 1 if np.random.random() < adjusted_prob else 0
@@ -323,9 +338,10 @@ class CoreBankingDataGenerator:
                 model = np.random.choice(['on_premise', 'hybrid_cloud', 'private_cloud', 'public_cloud'],
                                         p=[0.50, 0.30, 0.15, 0.05])
             else:  # microfinance
-                # Microfinance: mostly on-premise
+                # Microfinance: Mixed (Digital fintechs cloud-native, traditional MFBs on-premise)
+                # OPay, Kuda, PalmPay, FairMoney = public/hybrid cloud; Traditional MFBs = on-premise
                 model = np.random.choice(['on_premise', 'hybrid_cloud', 'private_cloud', 'public_cloud'],
-                                        p=[0.70, 0.20, 0.08, 0.02])
+                                        p=[0.40, 0.30, 0.10, 0.20])
             models.append(model)
         
         return np.array(models)
@@ -347,9 +363,9 @@ class CoreBankingDataGenerator:
                 strategy = np.random.choice(['big_bang', 'canary', 'blue_green', 'rolling'],
                                           p=[0.35, 0.25, 0.25, 0.15])
             else:  # microfinance
-                # Microfinance: mostly big bang
+                # Microfinance: Mixed (Fintechs use advanced CI/CD, traditional MFBs use big bang)
                 strategy = np.random.choice(['big_bang', 'canary', 'blue_green', 'rolling'],
-                                          p=[0.50, 0.20, 0.20, 0.10])
+                                          p=[0.35, 0.25, 0.25, 0.15])
             strategies.append(strategy)
         
         return np.array(strategies)
